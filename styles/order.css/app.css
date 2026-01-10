@@ -1,0 +1,364 @@
+/*=======================
+          בסיס
+========================*/
+
+:root {
+    --h: 240;
+    /* גוון */
+    --c: 20;
+    /* רמת גוון (קו אנכי בפיקר): 0 = שחור - לבן, 100 = שחור - גוון */
+    --d: calc(var(--c) * 1%);
+    --ui-base: hwb(var(--h) calc(100% - var(--d)) 0%);
+    --ui-5: hwb(var(--h) calc(95% - var(--d)) 5%);
+    --ui-10: hwb(var(--h) calc(90% - var(--d)) 10%);
+    --ui-15: hwb(var(--h) calc(85% - var(--d)) 15%);
+    --ui-20: hwb(var(--h) calc(80% - var(--d)) 20%);
+    --ui-25: hwb(var(--h) calc(75% - var(--d)) 25%);
+    --ui-45: hwb(var(--h) calc(55% - var(--d)) 45%);
+    --ui-80: hwb(var(--h) calc(20% - var(--d)) 80%);
+
+    --ui-accent-focus: #3b82f5;
+    --ui-accent: #0078d4;
+    --ui-radius: 6px;
+    --ui-spacing: 12px;
+    --ui-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+body.editor-dark-mode {
+    --ui-base: hwb(var(--h) 5% 95%);
+    --ui-5: hwb(var(--h) calc(10% - var(--d)) 90%);
+    --ui-10: hwb(var(--h) calc(15% - var(--d)) 85%);
+    --ui-15: hwb(var(--h) calc(20% - var(--d)) 80%);
+    --ui-20: hwb(var(--h) calc(25% - var(--d)) 75%);
+    --ui-25: hwb(var(--h) calc(30% - var(--d)) 70%);
+    --ui-45: hwb(var(--h) calc(50% - var(--d)) 50%);
+    --ui-80: hwb(var(--h) calc(85% - var(--d)) 15%);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: var(--ui-10);
+    color: var(--ui-80);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    direction: rtl;
+    overflow: hidden;
+}
+
+.selected-element {
+    outline: 1px solid black;
+    outline-offset: -1px;
+}
+
+/* גבולות עזר. מציג גבול רק כשהקלאס קיים על העורך */
+.show-outlines * {
+    outline: 1px dashed rgba(0, 120, 212, 0.3) !important;
+}
+
+.show-outlines *:hover {
+    outline: 1px solid rgba(0, 120, 212, 0.6) !important;
+}
+
+*,
+*::after,
+*::before {
+    box-sizing: border-box;
+}
+
+/*=========================
+           header
+==========================*/
+
+
+.app-header {
+    height: 45px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 15px;
+    background-color: var(--ui-15);
+    border-bottom: 1px solid var(--ui-25);
+    z-index: 200;
+}
+
+.header-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-section.center {
+    font-size: 13px;
+    color: var(--ui-45);
+    font-weight: 500;
+}
+
+.app-logo {
+    font-weight: bold;
+    padding: 0 10px;
+}
+
+.header-icon-btn {
+    cursor: pointer;
+    font-size: 18px;
+    color: var(--ui-80);
+    display: flex;
+    align-items: center;
+    transition: 0.2s;
+}
+
+.header-icon-btn:hover {
+    color: var(--ui-base);
+}
+
+/* כפתור החץ שמסתובב */
+.toggle-edit-bar {
+    transition: transform 0.3s;
+}
+
+.toggle-edit-bar.active {
+    transform: rotate(180deg);
+    color: var(--accent);
+}
+
+
+
+/*=====================
+        topBar
+======================*/
+
+
+.edit-actions-bar {
+    background-color: var(--ui-20);
+    border-bottom: 1px solid var(--ui-25);
+    height: 50px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.edit-actions-bar.collapsed {
+    height: 0;
+    border-bottom: none;
+}
+
+.action-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    user-select: none;
+}
+
+.action-toggle input {
+    display: none;
+}
+
+.action-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.action-toggle:has(input:checked) {
+    background: var(--accent);
+    color: white;
+}
+
+.divider-vertical {
+    width: 1px;
+    height: 20px;
+    background: var(--ui-25);
+}
+
+
+
+/*====================================
+                main
+=====================================*/
+
+
+.main-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+aside {
+    overflow: hidden;
+    /* שלא יראו את התוכן כשהוא סגור */
+    background: var(--ui-15);
+    width: 0;
+    opacity: 0;
+    /* אנימציה חלקה לפתיחה משמאל */
+    transition: width 0.3s ease-in-out,
+        opacity 0.2s ease-in;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+aside.open {
+    overflow: auto;
+    width: 280px;
+    opacity: 1;
+    flex-shrink: 0;
+    transition: width 0.3s ease-in-out,
+        opacity 0.2s ease-in;
+}
+
+.panel-right {
+    border-left: 1px solid var(--ui-25);
+}
+
+.panel-left {
+    border-right: 1px solid var(--ui-25);
+}
+
+.workspace {
+    padding: 40px;
+    box-sizing: border-box;
+    background-color: var(--ui-base);
+    overflow: hidden;
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-image: linear-gradient(var(--ui-15) 0, transparent 0.4px),
+        linear-gradient(90deg, var(--ui-10) 0, transparent 0.5px);
+    background-size: 2px 2px;
+    /* הוספת מעבר חלק כשהמקום הפנוי משתנה */
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.editor-dark-mode .workspace {
+    background-image: linear-gradient(var(--ui-25) 0, transparent 0.4px),
+        linear-gradient(90deg, var(--ui-20) 0, transparent 0.5px);
+}
+
+
+
+/*=========================
+          workspace
+==========================*/
+
+
+/* The Viewport Controls (Floating) */
+.width-screen {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ui-20);
+    border: 1px solid var(--ui-25);
+    border-radius: 20px;
+    display: flex;
+    padding: 5px;
+    gap: 5px;
+    z-index: 10;
+    margin-top: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.ws-btn {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 50%;
+    color: var(--ui-80);
+}
+
+.ws-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--ui-base);
+}
+
+.ws-btn.active {
+    background: var(--accent);
+    color: var(--ui-base);
+}
+
+.canvas-scroller {
+    flex: 1;
+    display: flex;
+    overflow: auto;
+    box-sizing: border-box;
+    background-color: white;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.canvas {
+    flex: 1;
+    border-radius: 6px;
+    background-color: white;
+    box-sizing: border-box;
+    /* הטריק "לכליאת" אלמנטים עם position: fixed */
+    transform: translate(0);
+}
+
+
+.canvas-scroller:focus-visible,
+.canvas:focus-visible,
+.canvas .canvas-scroller {
+    outline: none;
+}
+
+
+
+
+/*==========================
+            sidebar
+===========================*/
+
+
+.sidebar-icons {
+    width: 50px;
+    background: var(--ui-15);
+    border-right: 1px solid var(--ui-25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 10px;
+    flex-shrink: 0;
+    gap: 5px;
+}
+
+.activity-btn {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.1s;
+    background-color: var(--ui-10);
+}
+
+.activity-btn:hover {
+    background-color: var(--ui-20);
+}
+
+.activity-btn.active {
+    /* border-top-right-radius: 0;
+    border-bottom-right-radius: 0; */
+    background-color: var(--ui-25);
+    border-left: 2px solid var(--accent);
+    color: var(--accent);
+}
+
+.activity-btn svg {
+    width: 24px;
+    height: 24px;
+}

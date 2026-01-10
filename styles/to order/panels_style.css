@@ -1,0 +1,407 @@
+#panels {
+    z-index: 10;
+}
+
+.design-control {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 15px;
+    font-size: 14px;
+    cursor: default;
+}
+
+/* CSS חדש לניהול פאנלים */
+.panel {
+    margin: 15px 0;
+    padding: 10px;
+    /*border: 1px solid #ddd;
+    border-radius: 4px;*/
+    background-color: var(--ui-5);
+    border-bottom: 1px solid var(--ui-15);
+    display: none;
+}
+
+.panel h4 {
+    margin-top: 0;
+    border-bottom: 1px dashed var(--ui-10);
+    padding-bottom: 5px;
+}
+
+
+.design-control-grid-4 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    font-size: 13px;
+}
+
+.design-control-grid-4 input {
+    width: 40px;
+    margin-top: 4px;
+}
+
+
+/* ========== עיצוב ראש סרגל צד ========== */
+
+.panel-header {
+    display: flex;
+    flex-wrap: wrap;
+    /* אפשר גלישה למסכים צרים */
+    align-items: center;
+    gap: 10px;
+    /* רווח בין הפריטים */
+    border-bottom: 1px solid var(--ui-20);
+    /* margin-bottom: 15px; */
+    background-color: var(--ui-5);
+    /* רקע עדין */
+    padding: 18px 15px;
+}
+
+.panel-header-content {
+    display: flex;
+    flex-direction: column;
+    /* כותרת מעל הפקד */
+}
+
+.panel-header-content label {
+    font-size: 11px;
+    color: var(--ui-80);
+    margin-bottom: 3px;
+    font-weight: bold;
+}
+
+.panel-header-content select,
+.panel-header-content input {
+    font-size: 13px;
+    padding: 4px;
+    border: 1px solid var(--ui-20);
+    border-radius: 3px;
+    background-color: var(--ui-base);
+}
+
+/* הגדרות ספציפיות */
+#selectedElement {
+    flex-grow: 1;
+    /* תן לקבוצת האלמנטים לתפוס מקום */
+}
+
+#theElement {
+    min-width: 100px;
+    background-color: var(--ui-5);
+    /* רקע אפרפר לאינפוט קריאה בלבד */
+    color: var(--ui-80);
+}
+
+#edition-states select {
+    width: 80px;
+    /* רוחב קבוע למצבים */
+}
+
+/* === עיצוב אלמנטים בתוך הפאנלים === */
+
+/* כותרות פאנלים */
+.panel h4 {
+    margin: 0 0 15px 0;
+    font-size: 14px;
+    color: var(--ui-80);
+    font-weight: 600;
+    border-bottom: 1px solid var(--ui-10);
+    padding-bottom: 5px;
+}
+
+/* שורות שליטה (Label + Input) */
+.design-control {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: var(--ui-80);
+}
+
+.design-control input,
+.design-control select {
+    padding: 4px;
+    border: 1px solid var(--ui-20);
+    border-radius: 3px;
+    font-size: 13px;
+    background-color: var(--ui-base);
+}
+
+/* רשת של 4 פריטים (למשל Margin/Padding) */
+.design-control-grid-4 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.design-control-grid-4 label {
+    display: flex;
+    flex-direction: column;
+    font-size: 11px;
+    color: var(--ui-80);
+}
+
+.design-control-grid-4 input {
+    margin-top: 2px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* כדי שהתוכן לא "יימעך" בזמן האנימציה */
+.panel-header,
+#panels {
+    width: 279px;
+    /* רוחב קבוע לתוכן הפנימי */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/*===================================
+ הגדרות לנראות החדשה של הפאנלים
+ ===================================*/
+
+.panel-section {
+    border-bottom: 1px solid var(--ui-10);
+    margin-bottom: 10px;
+}
+
+.section-header {
+    padding: 10px 5px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    color: var(--ui-80);
+    background: var(--ui-base);
+    transition: background 0.2s;
+}
+
+.section-header:hover {
+    background: #f9f9f9;
+}
+
+.section-header::after {
+    content: '▼';
+    font-size: 10px;
+    color: var(--ui-45);
+    transition: transform 0.3s;
+}
+
+.panel-section.collapsed .section-header::after {
+    transform: rotate(-90deg);
+}
+
+.panel-section.collapsed .section-content {
+    display: none;
+}
+
+.section-content {
+    padding: 10px 5px;
+}
+
+
+/* --- קבוצת קלט חכמה (Input + Unit) --- */
+.input-group {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--ui-20);
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--ui-base);
+    width: 100%;
+}
+
+.input-group:focus-within {
+    border-color: #0078d4;
+    box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.1);
+}
+
+.input-group input {
+    border: none !important;
+    flex-grow: 1;
+    padding: 6px !important;
+    width: 0 !important;
+    /* כדי שיאפשר לכווץ */
+    min-width: 0;
+}
+
+.input-group input:focus {
+    box-shadow: none !important;
+}
+
+.unit-select {
+    border: none !important;
+    background: var(--ui-5);
+    color: var(--ui-45);
+    font-size: 11px;
+    padding: 0 4px;
+    height: 100%;
+    border-left: 1px solid var(--ui-5) !important;
+    cursor: pointer;
+    outline: none;
+}
+
+.unit-select:hover {
+    background: var(--ui-15);
+}
+
+
+/* --- מתג מצבים (All / Axis / Sides) --- */
+.mode-switcher {
+    display: flex;
+    background: var(--ui-5);
+    border-radius: 4px;
+    padding: 2px;
+    margin-bottom: 10px;
+}
+
+.mode-btn {
+    flex: 1;
+    border: none;
+    background: none;
+    padding: 4px;
+    font-size: 16px;
+    /* אייקונים גדולים */
+    cursor: pointer;
+    border-radius: 3px;
+    color: var(--ui-45);
+    transition: all 0.2s;
+}
+
+.mode-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.mode-btn.active {
+    background: var(--ui-base);
+    color: var(--ui-accent);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* רשתות דינמיות לפי המצב */
+.inputs-grid {
+    display: grid;
+    gap: 8px;
+}
+
+.grid-1 {
+    grid-template-columns: 1fr;
+}
+
+.grid-2 {
+    grid-template-columns: 1fr 1fr;
+}
+
+.grid-4 {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 15px;
+}
+
+/* תוויות קטנות מעל האינפוטים */
+.input-label-small {
+    font-size: 10px;
+    color: var(--ui-45);
+    margin-bottom: 2px;
+    display: block;
+}
+
+
+
+
+
+
+/* =========================================================
+   איחוד עיצוב גלובלי לכל הפאנלים (הוסף/החלף בקובץ panels_style.css)
+   ========================================================= */
+
+/* איפוס ועיצוב אחיד לכל האינפוטים והסלקטים בפאנלים */
+.panel input[type="text"],
+.panel input[type="number"],
+.panel input[type="color"],
+.panel select,
+.panel textarea {
+    width: 100%;
+    height: 30px;
+    /* גובה אחיד לכולם */
+    padding: 4px 8px;
+    border: 1px solid var(--ui-20);
+    border-radius: 4px;
+    background-color: var(--ui-base);
+    font-size: 13px;
+    color: var(--ui-80);
+    box-sizing: border-box;
+    /* קריטי! מונע גלישה מתוך הגריד */
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+/* מצב פוקוס אחיד ויפה */
+.panel input:focus,
+.panel select:focus,
+.panel textarea:focus {
+    border-color: var(--ui-accent);
+    box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
+}
+
+/* תוויות (Labels) אחידות */
+.design-control span,
+.panel-label,
+.input-label-small {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ui-80);
+    margin-bottom: 4px;
+    display: block;
+}
+
+/* עיצוב לקבוצת "אינפוט חכם" (כמו בבורדרס) */
+.input-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+}
+
+.input-container input {
+    padding-right: 20px;
+    /* מקום לחיצים הקטנים */
+    text-align: center;
+}
+
+/* שיפורים ל-Grid שלא יעלו אחד על השני */
+.inputs-grid {
+    display: grid;
+    gap: 10px;
+    /* רווח ברור בין האלמנטים */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.grid-2 {
+    grid-template-columns: 1fr 1fr;
+}
+
+.grid-4 {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+/* שיניתי ל-4 בשורה, או שאפשר 2X2 */
+.grid-4-responsive {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+/* 2X2 לרביעיות */
