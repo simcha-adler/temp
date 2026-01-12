@@ -127,3 +127,64 @@ function fillCorrectPosition() {
 }
 
 
+const positionSchema = [
+    { type: 'title', label: 'מיקום (Position)' },
+
+    {
+        type: 'control-row', inputType: 'select', label: 'שיטה', prop: 'position',
+        options: [
+            { value: 'static', text: 'אוטומטי' },
+            { value: 'relative', text: 'הזזת התצוגה' },
+            { value: 'absolute', text: 'מיקום קבוע ביחס להורה' },
+            { value: 'fixed', text: 'קבוע' },
+            { value: 'sticky', text: 'דביק' }
+        ],
+    },
+    {
+        type: 'control-row', inputType: 'number', label: 'שכבה', prop: 'zIndex',
+    },
+
+    // גריד של 4 כיוונים
+    { type: 'label', label: 'היסט' }, // לייבל עצמאי אם רוצים
+    {
+        type: 'grid-4',
+        children: [
+            { inputType: 'number', label: 'Top', prop: 'top', unit: ['px', '%', 'vh'], onChange: (v) => updateStyle(getActiveSelectorKey(), 'top', v) },
+            { inputType: 'number', label: 'Bottom', prop: 'bottom', unit: ['px', '%', 'vh'], onChange: (v) => updateStyle(getActiveSelectorKey(), 'bottom', v) },
+            { inputType: 'number', label: 'Left', prop: 'left', unit: ['px', '%', 'vw'], onChange: (v) => updateStyle(getActiveSelectorKey(), 'left', v) },
+            { inputType: 'number', label: 'Right', prop: 'right', unit: ['px', '%', 'vw'], onChange: (v) => updateStyle(getActiveSelectorKey(), 'right', v) }
+        ]
+    },
+
+    { type: 'title', label: 'גודל (Size)' },
+
+    // רוחב וגובה
+    {
+        type: 'grid-2',
+        children: [
+            { inputType: 'number', label: 'רוחב', prop: 'width', unit: ['px', '%', 'vw', 'auto'], onChange: (v) => updateStyle(getActiveSelectorKey(), 'width', v) },
+            { inputType: 'number', label: 'גובה', prop: 'height', unit: ['px', '%', 'vh', 'auto'], onChange: (v) => updateStyle(getActiveSelectorKey(), 'height', v) }
+        ]
+    },
+
+    // מינימום רוחב/גובה
+    {
+        type: 'section', label: 'הגבלות גודל (Min/Max)', collapsed: true,
+        children: [
+            {
+                type: 'grid-2',
+                children: [
+                    { inputType: 'number', label: 'רוחב מינימלי', prop: 'minWidth', unit: 'px', onChange: (v) => updateStyle(getActiveSelectorKey(), 'minWidth', v) },
+                    { inputType: 'number', label: 'גובה מינימלי', prop: 'minHeight', unit: 'px', onChange: (v) => updateStyle(getActiveSelectorKey(), 'minHeight', v) },
+                    { inputType: 'number', label: 'רוחב מקסימלי', prop: 'maxWidth', unit: 'px', onChange: (v) => updateStyle(getActiveSelectorKey(), 'maxWidth', v) },
+                    { inputType: 'number', label: 'גובה מקסימלי', prop: 'maxHeight', unit: 'px', onChange: (v) => updateStyle(getActiveSelectorKey(), 'maxHeight', v) }
+                ]
+            }
+        ]
+    }
+];
+
+
+buildUiPanel($('panel-position'), positionSchema);
+
+

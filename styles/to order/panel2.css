@@ -18,10 +18,15 @@
     color: var(--ui-80);
 }
 
+.ui-title.small {
+    font-size: 12px;
+    text-align: center;
+}
+
 /* --- Layouts --- */
 .ui-grid-2,
 .ui-grid-4 {
-    display: grid;
+    /* display: grid; */
     grid-template-columns: 1fr 1fr;
     gap: 4px 8px;
     margin-bottom: 8px;
@@ -30,36 +35,31 @@
 /* --- Components --- */
 /* שורה רגילה (לייבל + אינפוט) */
 .ui-control-row {
-    margin-bottom: 10px;
-}
-
-.ui-control-row .ui-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--ui-45);
-    margin-bottom: 4px;
-}
-
-/* שורת מתג (טקסט ימין, מתג שמאל) */
-.ui-toggle-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: 20px;
     min-height: 24px;
+    gap: 10px;
 }
 
-.ui-toggle-row .ui-label {
-    margin: 0;
+.ui-control-row.flex-col {
+    flex-direction: column;
+    justify-items: start;
+    align-items: stretch;
+    gap: 6px;
+}
+
+.ui-label {
     font-size: 13px;
+    font-weight: 400;
     color: var(--ui-80);
 }
 
 /* --- Inputs --- */
 .ui-input,
 .ui-select {
-    width: 100%;
+    width: 150px;
     height: 32px;
     padding: 0 8px;
     border: 1px solid var(--ui-10);
@@ -122,7 +122,8 @@
 .ui-section {
     border: 1px solid var(--ui-45);
     border-radius: var(--ui-radius);
-    margin-bottom: 10px;
+    margin-bottom: 25px;
+    margin-top: 25px;
     overflow: hidden;
     background: var(--ui-base);
 }
@@ -153,7 +154,8 @@
 
 /* כשהסקשן סגור, מסתירים את הגוף */
 .ui-section.collapsed .ui-section-body {
-    display: none;
+    /* display: none; */
+    height: 0;
 }
 
 .ui-section.collapsed .ui-section-head::after {
@@ -161,8 +163,10 @@
 }
 
 .ui-section-body {
-    padding: 10px;
+    padding: 20px 10px 0 10px;
     border-top: 1px solid var(--ui-10);
+    height: 100%;
+    transform: all 0.4s;
 }
 
 /* --- Buttons --- */

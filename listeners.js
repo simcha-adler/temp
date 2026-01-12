@@ -18,10 +18,18 @@ function loadDocumentListeners() {
         //  קבע את הסלקטור
         const state = $('dropdown-states').value; // ':hover', ':focus' או ""
         const selector = '#' + theElement.id + state; // '#כותרת-לדוגמא:hover'
+        const input = e.target;
+        const data = input.dataset;
 
-        let prop = e.target.dataset.property;
-        const unit = e.target.dataset.unit || ''; // למשל 'px'
-        let value = e.target.value;
+        let prop = data.property;
+        const unit = data.unit || ''; // למשל 'px'
+        let value = input.value;
+
+        if (input.type === 'checkbox') {
+            if (data.v)
+                value = input.checked ? data.v : data.x;
+            else value = input.checked;
+        }
 
         if (prop === 'gradient') {
             prop = 'background'

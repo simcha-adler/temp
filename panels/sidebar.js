@@ -176,6 +176,7 @@ function toggleActivityPanel(btn) {
     } else {
         // 2. אחרת -> פתח את הפאנל החדש
         if (panelId !== 'panel-tree') panelLeft.addClass('open');
+        else $('panel-right').addClass('open');
         updateActivityBarState(btn);
         updatePanel(panel);
     }

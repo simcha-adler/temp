@@ -18,21 +18,19 @@ function renderComponent(item) {
         case 'title':
             return createElement('div', { class: 'ui-title', text: item.label });
         case 'small-title':
-            return createElement('div', { class: 'ui-title', text: item.label });
+            return createElement('div', { class: 'ui-title small', text: item.label });
         case 'section': return renderSection(item);
         case 'grid-2':
         case 'grid-4': return renderGrid(item);
 
         // Smart Components
         case 'control-row': return renderControlRow(item);
-        case 'toggle-row': return renderToggleRow(item);
         case 'button': return renderButton(item);
 
-        case 'custom-container':
         case 'div':
             const div = document.createElement('div');
             if (item.id) div.id = item.id;
-            if (item.className) div.className = item.className;
+            if (item.class) div.className = item.class;
             if (item.style) div.style.cssText = item.style;
             return div;
 
@@ -75,7 +73,7 @@ function renderGrid(item) {
         if (child.label) {
             // Mini wrapper for grid items with labels
             const wrapper = createElement('div');
-            const lbl = createElement('label', {
+            const lbl = createElement('span', {
                 class: 'ui-label', style: 'fontSize: 11px;', text: child.label
             });
             wrapper.appendChild(lbl);
@@ -91,8 +89,9 @@ function renderGrid(item) {
 
 // The "Smart Row" (Label + Input)
 function renderControlRow(item) {
-    const wrapper = createElement('div', { class: 'ui-control-row' });
-    const label = createElement('label', { class: 'ui-label', text: item.label });
+    const cls = item.inputType === 'color' ? ' flex-col' : '';
+    const wrapper = createElement('div', { class: 'ui-control-row' + cls });
+    const label = createElement('span', { class: 'ui-label', text: item.label });
 
     wrapper.appendChild(label);
 
@@ -102,25 +101,10 @@ function renderControlRow(item) {
     return wrapper;
 }
 
-// The "Smart Toggle" (Label Left + Switch Right)
-function renderToggleRow(item) {
-    const wrapper = createElement('div', { class: 'ui-toggle-row' });
-    const label = createElement('span', { class: 'ui-label', text: item.label });
-    const switchLabel = createElement('label', { class: 'ui-switch' });
-    const input = createElement('input', { type: 'checkbox' });
-    input.onchange = (e) => item.onChange(e.target.checked);
-    const slider = createElement('span', { class: 'ui-slider' });
-
-    switchLabel.append(input, slider);
-    wrapper.append(label, switchLabel);
-
-    return wrapper;
-}
-
 function renderButton(item) {
     const btn = createElement('button', {
-        text: item.label,
-        class: 'ui-btn ' + (item.className || 'ui-btn-secondary'),
+        text: item.label, 'data-property': item.prop,
+        class: 'ui-btn ' + (item.class || 'ui-btn-secondary'),
     });
     btn.onclick = item.onClick;
     return btn;
@@ -131,7 +115,9 @@ function renderButton(item) {
 function renderInputControl(item) {
     switch (item.inputType) {
         case 'select':
-            const select = createElement('select', { class: 'ui-select' });
+            const select = createElement('select', {
+                class: 'ui-select', 'data-property': item.prop
+            });
             item.options.forEach(opt => {
                 const o = document.createElement('option');
                 // Support both ['a','b'] and [{value:'a', text:'A'}]
@@ -141,7 +127,9 @@ function renderInputControl(item) {
                 o.innerText = text;
                 select.appendChild(o);
             });
-            select.onchange = (e) => item.onChange(e.target.value);
+            if (item.prop === 'cursor') {
+                Array.from(select.children).forEach(opt => opt.style.cursor = opt.value);
+            }
             return select;
 
         case 'color':
@@ -149,11 +137,10 @@ function renderInputControl(item) {
 
         case 'range':
             const range = createElement('input', {
-                type: 'range', class: 'ui-range',
-                min: item.min || 0, max: item.max || 100,
-                value: item.val || (item.max / 2),
+                type: 'range', class: 'ui-range', 'data-property': item.prop,
+                min: item.min || 0, max: item.max || 100, step: item.step || 1,
+                value: item.value || (item.max / 2),
             });
-            range.oninput = (e) => item.onChange(e.target.value);
             return range;
 
         case 'number':
@@ -163,7 +150,7 @@ function renderInputControl(item) {
                 const group = createElement('div', { class: 'ui-input-group' });
                 const input = createElement('input', {
                     type: item.inputType,
-                    placeholder: '-'
+                    'data-property': item.prop
                 });
                 input.oninput = (e) => {
                     const currentUnit = group.$1('.ui-addon').value || group.$1('.ui-addon').innerText;
@@ -174,8 +161,7 @@ function renderInputControl(item) {
                 if (Array.isArray(item.unit)) {
                     addon = createElement('select', { class: 'ui-addon' });
                     item.unit.forEach(u => {
-                        const opt = document.createElement('option');
-                        opt.value = u; opt.innerText = u;
+                        const opt = createElement('option', { value: u, text: u });
                         addon.appendChild(opt);
                     });
 
@@ -187,10 +173,23 @@ function renderInputControl(item) {
                 group.append(input, addon);
                 return group;
             } else {
-                const input = createElement('input', { type: item.inputType, class: 'ui-input' });
+                const input = createElement('input', {
+                    type: item.inputType, class: 'ui-input', 'data-property': item.prop
+                });
                 input.oninput = (e) => item.onChange(e.target.value);
                 return input;
             }
+
+        case 'toggle':
+            const switchLabel = createElement('label', { class: 'ui-switch' });
+            const input = createElement('input', {
+                type: 'checkbox', 'data-property': item.prop,
+                'data-v': item.v, 'data-x': item.x
+            });
+            const slider = createElement('span', { class: 'ui-slider' });
+
+            switchLabel.append(input, slider);
+            return switchLabel;
 
         default:
             return createElement('div');
@@ -339,54 +338,7 @@ function loadBordersPanel() {
 }
 loadBordersPanel()
 
-/*layout.js*/
-const layoutSchema = [
-    { type: 'title', label: 'פריסת פלקס' },
 
-    {
-        type: 'control-row', label: 'כיוון', inputType: 'select', prop: 'flexDirection',
-        options: [
-            { value: 'row', text: 'שורה →' },
-            { value: 'column', text: 'טור ↓' },
-            { value: 'row-reverse', text: 'שורה הפוכה ←' },
-            { value: 'column-reverse', text: 'טור הפוך ↑' }
-        ],
-        onChange: (v) => theElement.style.flexDirection = v
-    },
-
-    {
-        type: 'control-row', label: 'יישור ראשי', inputType: 'select', prop: 'justifyContent',
-        options: [
-            { value: 'flex-start', text: 'התחלה' },
-            { value: 'center', text: 'מרכז' },
-            { value: 'flex-end', text: 'סוף' },
-            { value: 'space-between', text: 'רווח מקסימלי' },
-            { value: 'space-around', text: 'רווח מחולק' },
-            { value: 'space-evenly', text: 'רווח שווה' }
-        ],
-        onChange: (v) => theElement.style.justifyContent = v
-    },
-
-    {
-        type: 'control-row', label: 'יישור משני (Align)', inputType: 'select', prop: 'alignItems',
-        options: [
-            { value: 'flex-start', text: 'התחלה' },
-            { value: 'center', text: 'מרכז' },
-            { value: 'stretch', text: 'מתיחה' }
-        ],
-        onChange: (v) => theElement.style.alignItems = v
-    },
-
-    {
-        type: 'toggle-row', label: 'גלישת שורות', prop: 'flexWrap',
-        onChange: (isChecked) => theElement.style.flexWrap = isChecked ? 'wrap' : 'nowrap'
-    }
-];
-
-function loadLayoutPanel() {
-    buildUiPanel(document.getElementById('panel-layout'), layoutSchema, theStyles);
-}
-loadLayoutPanel()
 /*design.js*/
 const designSchema = [
     { type: 'title', label: 'עיצוב טקסט וצבע' },
@@ -430,181 +382,6 @@ function loadDesignPanel() {
     buildUiPanel(document.getElementById('panel-design'), designSchema, theStyles);
 }
 loadDesignPanel()
-/*settings.js
-ג'אווהסקריפט*/
-/*const settingsSchema = [
-    { type: 'title', label: 'הגדרות מערכת' },
-
-    {
-        type: 'section', label: 'כללי', collapsed: false,
-        children: [
-            {
-                type: 'toggle-row', label: 'מצב כהה', prop: 'theme',
-                onChange: (checked) => toggleTheme(checked)
-            },
-            {
-                type: 'toggle-row', label: 'שמירה אוטומטית', prop: 'autoSave',
-                onChange: (checked) => toggleAutoSave(checked)
-            }
-        ]
-    },
-
-    {
-        type: 'button', label: 'אפס הגדרות', className: 'ui-btn-danger',
-        onClick: () => {
-            if (confirm('בטוח?')) localStorage.clear();
-        }
-    }
-];
-*/
-// function loadSettingsPanel() {
-//     // Note: Assuming settings.data object exists
-//     buildUiPanel(document.getElementById('panel-settings'), settingsSchema, settings.data);
-// }
-// loadSettingsPanel();
-
-/*
-
-צודק לגמרי! התמקדנו בדוגמאות ושכחנו את הפאנלים הכבדים יותר.
-הנה ההשלמה המלאה עבור: Position, View, Classes, Theme, ו - Add Element.
-מכיוון שהבנאי שלנו(uiBuilder) יודע להקצות id לאלמנטים שהוא יוצר, הלוגיקה הקיימת שלך(שמשתמשת ב - getElementById או $ כדי למצוא קונטיינרים ולמלא אותם) תמשיך לעבוד, כל עוד נקפיד על ה - IDs הנכונים בג'ייסון.
-1.position.js
-פאנל זה משתמש הרבה ב - grid - 4 ובשדות עם יחידות מידה.
-    ג'אווהסקריפט*/
-const positionSchema = [
-    { type: 'title', label: 'מיקום (Position)' },
-
-    // שורה ראשונה: סוג מיקום ו-Z-Index
-    {
-        type: 'grid-2',
-        children: [
-            {
-                inputType: 'select', label: 'שיטה', prop: 'position',
-                options: [
-                    { value: 'static', text: 'אוטומטי' },
-                    { value: 'relative', text: 'הזזת התצוגה' },
-                    { value: 'absolute', text: 'מיקום קבוע ביחס להורה' },
-                    { value: 'fixed', text: 'קבוע' },
-                    { value: 'sticky', text: 'דביק' }
-                ],
-                onChange: (v) => updateStyle(getActiveSelectorKey(), 'position', v)
-            },
-            {
-                inputType: 'number', label: 'שכבה', prop: 'zIndex',
-                onChange: (v) => updateStyle(getActiveSelectorKey(), 'zIndex', v)
-            }
-        ]
-    },
-
-    // גריד של 4 כיוונים
-    { type: 'label', label: 'היסט' }, // לייבל עצמאי אם רוצים
-    {
-        type: 'grid-4',
-        children: [
-            { inputType: 'number', label: 'Top', prop: 'top', unit: ['px', '%', 'vh'], onChange: (v) => updateStyle(getActiveSelectorKey(), 'top', v) },
-            { inputType: 'number', label: 'Bottom', prop: 'bottom', unit: ['px', '%', 'vh'], onChange: (v) => updateStyle(getActiveSelectorKey(), 'bottom', v) },
-            { inputType: 'number', label: 'Left', prop: 'left', unit: ['px', '%', 'vw'], onChange: (v) => updateStyle(getActiveSelectorKey(), 'left', v) },
-            { inputType: 'number', label: 'Right', prop: 'right', unit: ['px', '%', 'vw'], onChange: (v) => updateStyle(getActiveSelectorKey(), 'right', v) }
-        ]
-    },
-
-    { type: 'title', label: 'גודל (Size)' },
-
-    // רוחב וגובה
-    {
-        type: 'grid-2',
-        children: [
-            { inputType: 'number', label: 'רוחב', prop: 'width', unit: ['px', '%', 'vw', 'auto'], onChange: (v) => updateStyle(getActiveSelectorKey(), 'width', v) },
-            { inputType: 'number', label: 'גובה', prop: 'height', unit: ['px', '%', 'vh', 'auto'], onChange: (v) => updateStyle(getActiveSelectorKey(), 'height', v) }
-        ]
-    },
-
-    // מינימום רוחב/גובה
-    {
-        type: 'section', label: 'הגבלות גודל (Min/Max)', collapsed: true,
-        children: [
-            {
-                type: 'grid-2',
-                children: [
-                    { inputType: 'number', label: 'רוחב מינימלי', prop: 'minWidth', unit: 'px', onChange: (v) => updateStyle(getActiveSelectorKey(), 'minWidth', v) },
-                    { inputType: 'number', label: 'גובה מינימלי', prop: 'minHeight', unit: 'px', onChange: (v) => updateStyle(getActiveSelectorKey(), 'minHeight', v) },
-                    { inputType: 'number', label: 'רוחב מקסימלי', prop: 'maxWidth', unit: 'px', onChange: (v) => updateStyle(getActiveSelectorKey(), 'maxWidth', v) },
-                    { inputType: 'number', label: 'גובה מקסימלי', prop: 'maxHeight', unit: 'px', onChange: (v) => updateStyle(getActiveSelectorKey(), 'maxHeight', v) }
-                ]
-            }
-        ]
-    }
-];
-
-function loadPositionPanel() {
-    buildUiPanel(document.getElementById('panel-position'), positionSchema, theStyles);
-}
-loadPositionPanel();
-/*2.view.js
-תצוגה, נראות ואפקטים.
-    ג'אווהסקריפט*/
-const viewSchema = [
-    { type: 'title', label: 'תצוגה ואפקטים' },
-
-    {
-        type: 'control-row', label: 'סוג תצוגה', inputType: 'select', prop: 'display',
-        options: [
-            { value: 'block', text: 'בלוק' },
-            { value: 'inline', text: 'בתוך השורה' },
-            { value: 'inline-block', text: 'בלוק בתוך השורה' },
-            { value: 'flex', text: 'פריסה גמישה חד ממדית' },
-            { value: 'grid', text: 'פריסה גמישה דו ממדית' },
-            { value: 'none', text: 'מוסתר' }
-        ],
-        onChange: (v) => updateStyle(getActiveSelectorKey(), 'display', v)
-    },
-
-    {
-        type: 'grid-2',
-        children: [
-            {
-                inputType: 'select', label: 'גלישה (Overflow)', prop: 'overflow',
-                options: [
-                    { value: 'visible', text: 'רגיל' },
-                    { value: 'hidden', text: 'חתוך' },
-                    { value: 'scroll', text: 'גלילה' },
-                    { value: 'auto', text: 'אוטומטי' }
-                ],
-                onChange: (v) => updateStyle(getActiveSelectorKey(), 'overflow', v)
-            },
-            {
-                inputType: 'select', label: 'נראות (Visibility)', prop: 'visibility',
-                options: [
-                    { value: 'visible', text: 'גלוי' },
-                    { value: 'hidden', text: 'נסתר (תופס מקום)' }
-                ],
-                onChange: (v) => updateStyle(getActiveSelectorKey(), 'visibility', v)
-            }
-        ]
-    },
-
-    {
-        type: 'control-row', label: 'שקיפות', inputType: 'number', prop: 'opacity',
-        unit: '', // אין יחידה (0-1)
-        onChange: (v) => updateStyle(getActiveSelectorKey(), 'opacity', v)
-    },
-
-    {
-        type: 'control-row', label: 'סמן עכבר', inputType: 'select', prop: 'cursor',
-        options: [
-            { value: 'auto', text: 'אוטומטי' },
-            { value: 'pointer', text: 'יד' },
-            { value: 'text', text: 'טקסט' },
-            { value: 'not-allowed', text: 'חסום' }
-        ],
-        onChange: (v) => updateStyle(getActiveSelectorKey(), 'cursor', v)
-    }
-];
-
-function loadViewPanel() {
-    buildUiPanel(document.getElementById('panel-display'), viewSchema, theStyles);
-}
-loadViewPanel();
 
 /*3.classes.js
 כאן אנחנו משתמשים בבנאי כדי ליצור את ה"שלד"(הקונטיינרים והאינפוטים), אבל הלוגיקה המקורית שלך(refreshClassesView) היא זו שתמלא את ה - divים בתוכן דינמי(תגיות).
@@ -617,9 +394,9 @@ const classesSchema = [
     {
         // אנו יוצרים div ריק עם ID ספציפי כדי שהלוגיקה הקיימת תדע "לשפוך" לתוכו את התגיות
         // נשתמש בטריק של יצירת "רכיב קלט" שהוא בעצם קונטיינר
-        type: 'custom-container', // נצטרך לוודא שזה נתמך או להשתמש ב-section ריק
+        type: 'div', // נצטרך לוודא שזה נתמך או להשתמש ב-section ריק
         id: 'activeClassesList',
-        className: 'ui-input-group', // סתם שייראה כמו מסגרת
+        class: 'ui-input-group', // סתם שייראה כמו מסגרת
         style: 'min-height: 40px; padding: 5px; flex-wrap: wrap; height: auto;'
     },
 
@@ -633,13 +410,13 @@ const classesSchema = [
                 onChange: () => { } // הלוגיקה מטופלת בנפרד בכפתור
             },
             {
-                type: 'button', id: 'btnConnectClass', label: 'שייך', className: 'ui-btn-primary',
+                type: 'button', id: 'btnConnectClass', label: 'שייך', class: 'ui-btn-primary',
                 onClick: () => { } // המאזין יחובר בפונקציה הראשית בנפרד, או כאן אם תרצה
             }
         ]
     },
     {
-        type: 'button', id: 'btnCreateRule', label: '🛠️ צור חוק CSS חדש', className: 'ui-btn-secondary',
+        type: 'button', id: 'btnCreateRule', label: '🛠️ צור חוק CSS חדש', class: 'ui-btn-secondary',
         style: 'font-size: 11px; margin-bottom: 15px;'
     },
 
@@ -672,7 +449,7 @@ const themeSchema = [
     },
 
     {
-        type: 'button', id: 'btnAddThemeItem', label: '+ צור טווח חדש', className: 'ui-btn-primary',
+        type: 'button', id: 'btnAddThemeItem', label: '+ צור טווח חדש', class: 'ui-btn-primary',
         onClick: () => openThemeEditor()
     }
 ];
@@ -706,7 +483,7 @@ const addElementSchema = [
     },
 
     {
-        type: 'button', id: 'btnAdd', label: '+ הוסף למסמך', className: 'ui-btn-primary',
+        type: 'button', id: 'btnAdd', label: '+ הוסף למסמך', class: 'ui-btn-primary',
         onClick: executeAdd // הפונקציה המקורית
     }
 ];

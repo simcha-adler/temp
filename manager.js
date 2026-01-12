@@ -31,8 +31,7 @@ function updateSelectedElement(newElement = null) {
 function updatePanel(panel) {
     if (thePanel === panel) return;
 
-    if (thePanel)
-        thePanel.style.display = 'none';
+    if (thePanel) setTimeout(thePanel.style.display = 'none', 3000);
     thePanel = panel;
     if (panel) {
         panel.style.display = 'block';
@@ -40,7 +39,7 @@ function updatePanel(panel) {
         if (panel === panelTree)
             renderTree();
         else
-            restartPanel(thePanel);
+            populatePanelValues(thePanel);
     }
 }
 
@@ -77,7 +76,6 @@ function loadPage() {
     updateSelectedElement(editor);
     renderTree();
     initTreeListeners();
-    settings.init();
 }
 
 loadPage();

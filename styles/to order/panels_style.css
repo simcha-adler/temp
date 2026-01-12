@@ -333,7 +333,6 @@
 .panel input[type="color"],
 .panel select,
 .panel textarea {
-    width: 100%;
     height: 30px;
     /* גובה אחיד לכולם */
     padding: 4px 8px;

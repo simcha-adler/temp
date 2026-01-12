@@ -3,12 +3,12 @@
 const settings = {
 
     defaultData: {
-        darkMod: 'false',       // 'light' או 'dark' (ממשק העורך)
+        darkMod: false,       // 'light' או 'dark' (ממשק העורך)
         showOutlines: false,  // האם להציג גבולות לכל האלמנטים בדף (לעזרה בעיצוב)
         autoSave: true,       // האם לשמור אוטומטית
         language: 'he',       // שפת ממשק
         uiScale: 100,          // גודל ממשק (זום)
-        huePrimary: 120,
+        huePrimary: 240,
         saturationPrimary: 0,
 
     },
@@ -22,14 +22,21 @@ const settings = {
             try {
                 // מיזוג ההגדרות השמורות עם ברירות המחדל (למקרה שהוספנו פיצ'רים חדשים)
                 settings.data = { ...settings.defaultData, ...JSON.parse(saved) };
+                settings.apply();
+                settings.save();
             } catch (e) {
-                settings.data = { ...settings.defaultData };
+                settings.reloadDefoult();
                 console.error('שגיאה בטעינת הגדרות. נטענו הגדרות אוטומטיות', e);
             }
+        } else {
+            settings.reloadDefoult();
         }
+    },
 
-        // 2. החלת ההגדרות בפועל
+    reloadDefoult: () => {
+        settings.data = { ...settings.defaultData };
         settings.apply();
+        settings.save();
     },
 
     save: () => {
@@ -46,6 +53,8 @@ const settings = {
             body.removeClass('editor-dark-mode');
         }
 
+        document.documentElement.style.setProperty('--h', settings.data.huePrimary);
+        document.documentElement.style.setProperty('--c', settings.data.saturationPrimary);
         // --- יישום גבולות עזר ---
         // מוסיף קלאס לקונטיינר של העורך
         if (settings.data.showOutlines) {
@@ -64,6 +73,18 @@ const settings = {
         settings.data[key] = value;
         settings.apply();
         settings.save();
+    },
+
+    fillPanel: () => {
+        // מוצא את כל האינפוטים שיש להם שיוך ל-CSS Property
+        const inputs = $('panel-settings').$$('[data-property]');
+
+        inputs.forEach(input => {
+            const prop = input.dataset.property;
+            if (input.type === 'checkbox') {
+                input.checked = settings.data[prop];
+            } else { input.value = settings.data[prop]; }
+        });
     }
 }
 
@@ -76,42 +97,29 @@ const settingsSchema = [
     {
         type: 'section', label: 'גווני האתר', collapsed: false,
         children: [
-            { type: 'title', label: 'צבע בסיס (רקעים)' },
-            {
-                type: 'toggle-row', label: 'מצב כהה',
-                onChange: (checked) => settings.update('darkMod', checked)
-            },
+            { type: 'small-title', label: 'צבע בסיס (רקעים)' },
+            { type: 'control-row', label: 'מצב כהה', prop: 'darkMod', inputType: 'toggle' },
             {
                 // סליידר לגוון (Hue)
                 type: 'control-row', label: 'גוון', inputType: 'range',
-                // אנו לא שומרים ב-settings.data אובייקט מורכב כרגע כדי לשמור על פשטות, 
-                // אלא משנים ישירות את המשתנה. בגרסה מתקדמת תשמור גם את זה.
-                prop: 'baseHue',
-                min: 0, max: 360,
-                onChange: (v) => updateCssVar('--h', v)
+                prop: 'huePrimary', min: 0, max: 360
             },
             {
                 // סליידר לבהירות/רוויה (Whiteness)
                 type: 'control-row', label: 'רוויה', inputType: 'range',
-                prop: 'baseWhite',
-                min: 0, max: 100, unit: '%',
-                onChange: (v) => updateCssVar('--c', v)
+                prop: 'saturationPrimary', min: 0, max: 100
             },
 
-            { type: 'title', label: 'צבע הדגשה (Accent)' },
+            { type: 'small-title', label: 'צבע הדגשה (Accent)' },
             {
                 // סליידר לגוון הדגשה
                 type: 'control-row', label: 'גוון (Hue)', inputType: 'range',
-                prop: 'accentHue',
-                min: 0, max: 360,
-                onChange: (v) => updateCssVar('--ah', v)
+                prop: 'accentHue', min: 0, max: 360
             },
             {
                 // סליידר לבהירות הדגשה
                 type: 'control-row', label: 'בהירות (W)', inputType: 'range',
-                prop: 'accentWhite',
-                min: 0, max: 100, unit: '%',
-                onChange: (v) => updateCssVar('--aw', v + '%')
+                prop: 'accentWhite', min: 0, max: 100
             }
         ]
     },
@@ -120,116 +128,31 @@ const settingsSchema = [
     {
         type: 'section', label: 'הגדרות נוספות', collapsed: true,
         children: [
-            {
-                type: 'toggle-row', label: 'שמירה אוטומטית', prop: 'autoSave',
-                onChange: (checked) => {
-                    settings.data.autoSave = checked;
-                    settings.save();
-                }
-            },
-            {
-                type: 'toggle-row', label: 'גבולות עזר (Outlines)', prop: 'showOutlines',
-                onChange: (checked) => {
-                    settings.data.showOutlines = checked;
-                    settings.apply();
-                    settings.save();
-                }
-            }
+            { type: 'control-row', label: 'שמירה אוטומטית', prop: 'autoSave', inputType: 'toggle' },
+            { type: 'control-row', label: 'גבולות עזר', prop: 'showOutlines', inputType: 'toggle' }
         ]
     },
 
     {
-        type: 'button', label: 'אפס להגדרות יצרן', className: 'ui-btn-danger',
+        type: 'button', label: 'אפס להגדרות יצרן', class: 'ui-btn-danger',
         onClick: () => {
             if (confirm('האם לאפס את כל ההגדרות?')) {
-                localStorage.removeItem('screenEditor_settings');
-                location.reload();
+                settings.reloadDefoult();
             }
         }
     }
 ];
 
-// פונקציית עזר לעדכון משתני CSS בזמן אמת
-function updateCssVar(variable, value) {
-    document.documentElement.style.setProperty(variable, value);
-}
-
 function loadSettingsPanel() {
-    // Note: Assuming settings.data object exists
     buildUiPanel($('panel-settings'), settingsSchema);
-    //attachSettingsListeners();
-}
+    settings.init();
+    settings.fillPanel();
 
-
-/*
-function loadSettingsPanel() {
-    // טעינת ערכים התחלתיים אם רוצים (אופציונלי)
-    // כרגע הסליידרים יתחילו באמצע או ב-0, 
-    // כדי שזה יהיה מושלם צריך לשלוף את הערך הנוכחי מ-getComputedStyle
-
-    // ניסיון לקרוא ערכים נוכחיים מה-CSS כדי שהסליידרים יעמדו במקום הנכון
-    const style = getComputedStyle(document.documentElement);
-    const context = {
-        ...settings.data,
-        baseHue: style.getPropertyValue('--h').trim(),
-        baseWhite: parseFloat(style.getPropertyValue('--w')),
-        accentHue: style.getPropertyValue('--ah').trim(),
-        accentWhite: parseFloat(style.getPropertyValue('--aw'))
-    };
-
-    buildUiPanel(document.getElementById('panel-settings'), settingsSchema, context);
-}
-
-loadSettingsPanel();
-*/
-
-// function loadSettingsPanel() {
-//     $('panel-settings').innerHTML = htmlSettings;
-//     initAccordions($('panel-settings')); // שימוש בפונקציה מהשלבים הקודמים
-
-//     // מילוי הערכים הנוכחיים
-//     $('settingDarkMode').checked = settings.data.darkMod;
-//     $('settingUiScale').value = settings.data.uiScale;
-//     $('settingOutlines').checked = settings.data.showOutlines;
-//     $('settingAutoSave').checked = settings.data.autoSave;
-
-//     attachSettingsListeners();
-// }
-
-function attachSettingsListeners() {
-    // מצב כהה
-    $('settingDarkMode').when('change', (e) => {
-        settings.data.darkMod = e.target.checked;
-        settings.apply(); // החלת השינוי מיידית
-        settings.save();  // שמירה לזיכרון
-    });
-
-    // גבולות עזר
-    $('settingOutlines').when('change', (e) => {
-        settings.data.showOutlines = e.target.checked;
-        settings.apply();
-        settings.save();
-    });
-
-    // סקייל ממשק
-    $('settingUiScale').when('input', (e) => {
-        settings.data.uiScale = e.target.value;
-        settings.apply();
-        settings.save();
-    });
-
-    // שמירה אוטומטית
-    $('settingAutoSave').when('change', (e) => {
-        settings.data.autoSave = e.target.checked;
-        settings.save();
-    });
-
-    // איפוס
-    $('btnResetSettings').whenClick(() => {
-        if (confirm('האם לאפס את כל הגדרות המערכת?')) {
-            localStorage.removeItem('screenEditor_settings');
-            location.reload(); // רענון הדף
-        }
+    $('panel-settings').when('input', (e) => {
+        const input = e.upTo('input');
+        if (input.type === 'checkbox') {
+            settings.update(input.dataset.property, input.checked);
+        } else { settings.update(input.dataset.property, input.value); }
     });
 }
 

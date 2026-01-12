@@ -139,6 +139,11 @@ body {
     align-items: center;
     padding: 0 20px;
     gap: 20px;
+    position: absolute;
+    z-index: 20;
+    top: 45px;
+    left: 0;
+    width: 100%;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
 }
@@ -231,6 +236,7 @@ aside.open {
     position: relative;
     flex: 1;
     display: flex;
+    align-items: center;
     flex-direction: column;
     background-image: linear-gradient(var(--ui-15) 0, transparent 0.4px),
         linear-gradient(90deg, var(--ui-10) 0, transparent 0.5px);
@@ -254,17 +260,19 @@ aside.open {
 /* The Viewport Controls (Floating) */
 .width-screen {
     position: absolute;
-    top: 15px;
+    width: 120px;
+    top: 0;
     left: 50%;
     transform: translateX(-50%);
-    background: var(--ui-20);
+    background: var(--ui-15);
     border: 1px solid var(--ui-25);
     border-radius: 20px;
     display: flex;
+    justify-content: space-around;
     padding: 5px;
     gap: 5px;
     z-index: 10;
-    margin-top: 15px;
+    margin-top: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
@@ -277,6 +285,7 @@ aside.open {
     cursor: pointer;
     border-radius: 50%;
     color: var(--ui-80);
+    flex: 1;
 }
 
 .ws-btn:hover {
@@ -295,6 +304,7 @@ aside.open {
     overflow: auto;
     box-sizing: border-box;
     background-color: white;
+    transition: all 0.4s;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 

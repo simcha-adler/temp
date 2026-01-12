@@ -292,18 +292,22 @@ const Color = {
  * @param {HTMLElement} panel - הפאנל (למשל $('panel-position'))
  * @param {CSSStyleDeclaration} styles - הסטייל המחושב של האלמנט
  */
-function populatePanelValues(panel, styles) {
-    if (!panel || !styles) return;
+function populatePanelValues(panel) {
+    if (!panel || !theStyles) return;
 
     // מוצא את כל האינפוטים שיש להם שיוך ל-CSS Property
-    const inputs = panel.querySelectorAll('[data-property]');
+    const inputs = panel.$$('[data-property]');
+    const styles = theStyles;
 
     inputs.forEach(input => {
         const prop = input.dataset.property;
         let value = styles[prop]; // שולף את הערך, למשל "10px" או "rgb(0,0,0)"
 
+        if (input.type === 'checkbox')
+            input.checked = value === input.dataset.v;
+
         // 1. טיפול בצבעים (המרה מ-rgb ל-hex)
-        if (input.type === 'color' || prop.toLowerCase().includes('color')) {
+        else if (input.type === 'color' || prop.toLowerCase().includes('color')) {
             // הנחת עבודה: יש לך פונקציה rgbToHex ב-services.js
             input.value = rgbToHex(value);
         }
