@@ -154,8 +154,7 @@
 
 /* כשהסקשן סגור, מסתירים את הגוף */
 .ui-section.collapsed .ui-section-body {
-    /* display: none; */
-    height: 0;
+    display: none;
 }
 
 .ui-section.collapsed .ui-section-head::after {
@@ -165,8 +164,6 @@
 .ui-section-body {
     padding: 20px 10px 0 10px;
     border-top: 1px solid var(--ui-10);
-    height: 100%;
-    transform: all 0.4s;
 }
 
 /* --- Buttons --- */

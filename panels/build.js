@@ -1,3 +1,170 @@
+/*const help = {
+    types: ['panel', 'title', 'smallTitle', 'section', 'grid', 'control', 'button', 'div'],
+    'input.data': [
+        'text' = { placeholder },
+        'textarea' = { placeholder, rows },
+        'number' = { unit, max, min, step },
+        'range' = { unit, max, min, step },
+        'toggle' = { 'data-v': 'data-x' },
+        'button' = { 'data-v': 'data-x' },
+        'select' = { options: [{ value, text }] },
+        'color' = {},
+        'comb' = { valInput: inputElement, unitInput: inputElement }
+    ],
+    'input.class': [
+        'text' = input,
+        'textarea' = t,
+        'number' = input,
+        'range' = t,
+        'toggle' = none,
+        'button' = t,
+        'select' = t,
+        'color' = none,
+        'comb' = input - group
+    ],
+
+    panel: [panelName, label, onInput = () => { settings || allDesigns || classes || addElement }],
+    title: [type, label],
+    smallTitle: [type, label],
+    section: [type, label, collapsed = true, children = [{}, {}]],
+    grid: [type, label, children = [{}, {}]],
+    control: [type, label, input = [type, id || '', prop, options || {}, data = {}]],
+    button: [type, label, Class, onClick = () => { }],
+    div: [type, id, Class, style]
+}*/
+
+const build = {
+    router: (item) => {
+        const result = build[item.type](item);
+        if (item.id) result.id = item.id;
+        return result;
+    },
+
+    fillChildren: (parent, children) => {
+        children.forEach(child => perent.appendChild(build.router(child)));
+    },
+
+    panel: (panel, { label, children, on }) => {
+        panel.innerHTML = '';
+
+        const title = createElement('div', { class: 'ui-title', text: label });
+        panel.appendChild(title);
+        build.fillChildren(panel, children);
+
+        panel.when('input' || 'change', (e) => on(e));
+    },
+    title: (item) => { return createElement('div', { class: 'ui-title', text: item.label }); },
+    smallTitle: (item) => { return createElement('div', { class: 'ui-title small', text: item.label }) },
+    section: (item) => {
+        const section = createElement('div', { class: 'ui-section' });
+        if (item.collapsed) section.addClass('collapsed');
+
+        const head = createElement('div', {
+            class: 'ui-section-head', text: item.label,
+        });
+        head.onclick = () => section.toggleClass('collapsed');
+
+        const body = createElement('div', { class: 'ui-section-body' });
+        build.fillChildren(body, item.children);
+
+        section.append(head, body);
+        return section;
+    },
+    grid: (item) => { },
+    inputRow: (item) => {
+        let cls = '';
+        if (item.input.type === 'color'/* || item.input.type === 'number'*/) cls = ' flex-col';
+        const wrapper = createElement('div', { class: 'ui-control-row' + cls });
+        const label = createElement('span', { class: 'ui-label', text: item.label });
+        const input = build.input.manager(item.input);
+
+        wrapper.append(label, input);
+        return wrapper;
+    },
+    button: (item) => {
+        const btn = createElement('button', {
+            text: item.label, class: 'ui-btn ' + (item.class || 'ui-btn-secondary')
+        });
+        btn.onclick = item.onClick;
+        return btn;
+    },
+    div: (item) => {
+        return createElement('div', {
+            id: item.id || '', class: item.class || '', style: item.style || ''
+        });
+    },
+    input: {
+        manager: (item) => {
+            if (item.type === 'color') return createSmartColorPicker(item);
+            // מציאת סוג הקלט
+            const type = item.type;
+            let inputType = type;
+            if (type === 'comb') inputType = 'text';
+            else if (type === 'toggle') inputType = 'checkbox';
+
+            // בניית האינפוט עצמו
+            let element = createElement('input', {
+                type: inputType,
+                id: item.id ?? item.prop,
+                'data-property': item.prop,
+            });
+
+            // הוספת קלאס תואם אינפוט
+            let cls = '';
+            if (type === 'text' || type === 'number') cls = 'ui-input';
+            else if (type === 'comb') cls = 'ui-input-group';
+            else cls = 'ui-' + type;
+
+            element.className = cls;
+
+            // עטיפה ותוספות לפי סוג האינפוט
+            switch (type) {
+                case 'text':
+                case 'textarea':
+                case 'number':
+                case 'range':
+                case 'button':
+                    updateElement(element, item.data);
+                    break;
+                case 'toggle':
+                    updateElement(element, item.data);
+                    element = build.input.toggle(element);
+                    break;
+                case 'select':
+                    build.input.select(element, item.data.options);
+                    break;
+                case 'comb':
+                    build.input.comb(element, item.data);
+            }
+
+            return element;
+        },
+
+        toggle: (input) => {
+            const switchLabel = createElement('label', { class: 'ui-switch' });
+            const slider = createElement('span', { class: 'ui-slider' });
+            switchLabel.append(input, slider);
+            return switchLabel;
+        },
+        select: (select, options) => {
+            options.forEach(opt => {
+                const o = createElement('option', { value: opt.value, text: opt.text });
+                select.appendChild(o);
+            });
+        },
+        comb: (wrapper, data) => {
+            const valInput = build.input.manager(data.valInput);
+            const unitInput = build.input.manager(data.unitInput);
+
+            wrapper.when('input' || 'change', (e) => {
+                let val = wrapper.children[0].value + wrapper.children[1].value;
+                e.target.value = val
+            })
+            wrapper.append(valInput, unitInput);
+        }
+    }
+}
+
 /**
  * UI Builder Engine
  * @param {HTMLElement} container - Target DOM element
@@ -89,15 +256,16 @@ function renderGrid(item) {
 
 // The "Smart Row" (Label + Input)
 function renderControlRow(item) {
-    const cls = item.inputType === 'color' ? ' flex-col' : '';
+    let cls = '';
+    if (item.inputType === 'color'/* || item.inputType === 'number'*/) cls = ' flex-col';
     const wrapper = createElement('div', { class: 'ui-control-row' + cls });
     const label = createElement('span', { class: 'ui-label', text: item.label });
-
-    wrapper.appendChild(label);
-
     const inputEl = renderInputControl(item);
-    wrapper.appendChild(inputEl);
 
+    const input = inputEl.$1('input');
+    if (input) input.id = item.id || item.key || '';
+
+    wrapper.append(label, inputEl);
     return wrapper;
 }
 
@@ -119,12 +287,7 @@ function renderInputControl(item) {
                 class: 'ui-select', 'data-property': item.prop
             });
             item.options.forEach(opt => {
-                const o = document.createElement('option');
-                // Support both ['a','b'] and [{value:'a', text:'A'}]
-                const value = typeof opt === 'object' ? opt.value : opt;
-                const text = typeof opt === 'object' ? opt.text : opt;
-                o.value = value;
-                o.innerText = text;
+                const o = createElement('option', { value: opt.value, text: opt.text });
                 select.appendChild(o);
             });
             if (item.prop === 'cursor') {
@@ -145,6 +308,7 @@ function renderInputControl(item) {
 
         case 'number':
         case 'text':
+        case 'textarea':
             // Simple input or Input Group
             if (item.unit) {
                 const group = createElement('div', { class: 'ui-input-group' });
@@ -152,10 +316,6 @@ function renderInputControl(item) {
                     type: item.inputType,
                     'data-property': item.prop
                 });
-                input.oninput = (e) => {
-                    const currentUnit = group.$1('.ui-addon').value || group.$1('.ui-addon').innerText;
-                    item.onChange(e.target.value + currentUnit);
-                };
 
                 let addon;
                 if (Array.isArray(item.unit)) {
@@ -164,8 +324,6 @@ function renderInputControl(item) {
                         const opt = createElement('option', { value: u, text: u });
                         addon.appendChild(opt);
                     });
-
-                    addon.onchange = () => item.onChange(input.value + addon.value);
                 } else {
                     addon = createElement('span', { class: 'ui-addon', text: item.unit });
                 }
@@ -176,11 +334,11 @@ function renderInputControl(item) {
                 const input = createElement('input', {
                     type: item.inputType, class: 'ui-input', 'data-property': item.prop
                 });
-                input.oninput = (e) => item.onChange(e.target.value);
                 return input;
             }
 
         case 'toggle':
+        case 'checkbox':
             const switchLabel = createElement('label', { class: 'ui-switch' });
             const input = createElement('input', {
                 type: 'checkbox', 'data-property': item.prop,
@@ -196,7 +354,7 @@ function renderInputControl(item) {
     }
 }
 
-function createSmartColorPicker(item, initialVal) {
+function createSmartColorPicker(item) {
     const wrapper = document.createElement('div');
     wrapper.className = 'ui-color-wrapper';
 
@@ -209,10 +367,10 @@ function createSmartColorPicker(item, initialVal) {
         </div>
         <div class="mode-solid">
             <div class="ui-color-trigger">
-                <div class="ui-color-preview" style="background:${initialVal}"></div>
-                <span style="font-size:12px; font-family:monospace;">${initialVal || 'Transparent'}</span>
+                <div class="ui-color-preview"></div>
+                <span style="font-size:12px; font-family:monospace;"></span>
             </div>
-            <input type="color" class="native-picker" value="${initialVal && initialVal.startsWith('#') ? initialVal : '#000000'}" style="position:absolute; opacity:0; pointer-events:none;">
+            <input type="color" class="native-picker" style="position:absolute; opacity:0; pointer-events:none;">
         </div>
         <div class="mode-theme" style="display:none;">
              <select class="ui-select theme-select"><option value="">בחר...</option></select>
@@ -268,121 +426,6 @@ function createSmartColorPicker(item, initialVal) {
 
 
 
-
-
-
-
-
-const bordersSchema = [
-    { type: 'title', label: 'גבולות וריווח' },
-
-    {
-        type: 'section', label: 'מסגרת', collapsed: false,
-        children: [
-            {
-                type: 'control-row', label: 'סגנון קו', inputType: 'select', prop: 'borderStyle',
-                options: [
-                    { value: 'none', text: 'ללא' },
-                    { value: 'solid', text: 'רציף' },
-                    { value: 'dashed', text: 'מקווקו' },
-                    { value: 'dotted', text: 'מנוקד' },
-                    { value: 'double', text: 'כפול' }
-                ],
-                onChange: (v) => updateStyle(getActiveSelectorKey(), 'borderStyle', v)
-            },
-            {
-                type: 'control-row', label: 'צבע', inputType: 'color', prop: 'borderColor',
-                onChange: (v) => updateStyle(getActiveSelectorKey(), 'borderColor', v)
-            },
-            {
-                type: 'control-row', label: 'עובי', inputType: 'number', prop: 'borderWidth', unit: 'px',
-                onChange: (v) => updateStyle(getActiveSelectorKey(), 'borderWidth', v)
-            }
-        ]
-    },
-
-    {
-        type: 'section', label: 'פינות עגולות (Radius)', collapsed: true,
-        children: [
-            {
-                type: 'grid-4',
-                children: [
-                    { inputType: 'number', label: '↖', prop: 'borderTopLeftRadius', unit: 'px', onChange: (v) => updateStyle(getActiveSelectorKey(), 'borderTopLeftRadius', v) },
-                    { inputType: 'number', label: '↗', prop: 'borderTopRightRadius', unit: 'px', onChange: (v) => updateStyle(getActiveSelectorKey(), 'borderTopRightRadius', v) },
-                    { inputType: 'number', label: '↘', prop: 'borderBottomRightRadius', unit: 'px', onChange: (v) => updateStyle(getActiveSelectorKey(), 'borderBottomRightRadius', v) },
-                    { inputType: 'number', label: '↙', prop: 'borderBottomLeftRadius', unit: 'px', onChange: (v) => updateStyle(getActiveSelectorKey(), 'borderBottomLeftRadius', v) }
-                ]
-            }
-        ]
-    },
-
-    {
-        type: 'section', label: 'ריווח פנימי (Padding)', collapsed: false,
-        children: [
-            {
-                type: 'grid-4',
-                children: [
-                    { inputType: 'number', label: 'Top', prop: 'paddingTop', unit: 'px', onChange: (v) => updateStyle(getActiveSelectorKey(), 'paddingTop', v) },
-                    { inputType: 'number', label: 'Right', prop: 'paddingRight', unit: 'px', onChange: (v) => updateStyle(getActiveSelectorKey(), 'paddingRight', v) },
-                    { inputType: 'number', label: 'Bottom', prop: 'paddingBottom', unit: 'px', onChange: (v) => updateStyle(getActiveSelectorKey(), 'paddingBottom', v) },
-                    { inputType: 'number', label: 'Left', prop: 'paddingLeft', unit: 'px', onChange: (v) => updateStyle(getActiveSelectorKey(), 'paddingLeft', v) }
-                ]
-            }
-        ]
-    },
-    // Margin same structure...
-];
-
-function loadBordersPanel() {
-    buildUiPanel(document.getElementById('panel-borders'), bordersSchema, theStyles);
-}
-loadBordersPanel()
-
-
-/*design.js*/
-const designSchema = [
-    { type: 'title', label: 'עיצוב טקסט וצבע' },
-
-    {
-        type: 'section', label: 'טיפוגרפיה', collapsed: false,
-        children: [
-            {
-                type: 'control-row', label: 'גופן', inputType: 'select', prop: 'fontFamily',
-                options: ['Arial', 'Verdana', 'Times New Roman', 'Courier New', 'System-ui'],
-                onChange: (v) => updateStyle(getActiveSelectorKey(), 'fontFamily', v)
-            },
-            {
-                type: 'control-row', label: 'גודל', inputType: 'number', prop: 'fontSize', unit: 'px',
-                onChange: (v) => updateStyle(getActiveSelectorKey(), 'fontSize', v)
-            },
-            {
-                type: 'control-row', label: 'משקל', inputType: 'select', prop: 'fontWeight',
-                options: [{ value: '400', text: 'רגיל' }, { value: '700', text: 'מודגש' }],
-                onChange: (v) => updateStyle(getActiveSelectorKey(), 'fontWeight', v)
-            }
-        ]
-    },
-
-    {
-        type: 'section', label: 'צבעים', collapsed: false,
-        children: [
-            {
-                type: 'control-row', label: 'צבע טקסט', inputType: 'color', prop: 'color',
-                onChange: (v) => updateStyle(getActiveSelectorKey(), 'color', v)
-            },
-            {
-                type: 'control-row', label: 'צבע רקע', inputType: 'color', prop: 'backgroundColor',
-                onChange: (v) => updateStyle(getActiveSelectorKey(), 'backgroundColor', v)
-            }
-        ]
-    }
-];
-
-function loadDesignPanel() {
-    buildUiPanel(document.getElementById('panel-design'), designSchema, theStyles);
-}
-loadDesignPanel()
-
 /*3.classes.js
 כאן אנחנו משתמשים בבנאי כדי ליצור את ה"שלד"(הקונטיינרים והאינפוטים), אבל הלוגיקה המקורית שלך(refreshClassesView) היא זו שתמלא את ה - divים בתוכן דינמי(תגיות).
     ג'אווהסקריפט*/
@@ -429,7 +472,7 @@ const classesSchema = [
 ];
 
 function loadClassesPanel() {
-    buildUiPanel(document.getElementById('panel-classes'), classesSchema, {});
+    buildUiPanel(document.getElementById('panel-classes'), classesSchema);
     // קריאה לפונקציות המקוריות שלך שממלאות את התוכן ומחברות מאזינים
     refreshClassesView();
     attachClassesListeners();
@@ -459,39 +502,3 @@ function loadThemePanel() {
     renderThemeList(); // הפונקציה המקורית שממלאת את הרשימה
 }
 loadThemePanel();
-/*5.addElement.js
-זה פאנל מיוחד כי הוא בונה טופס בתוך טופס.הבנאי שלנו יבנה את ה"מסגרת", והלוגיקה המקורית תמלא את האמצע.
-    ג'אווהסקריפט*/
-const addElementSchema = [
-    { type: 'title', label: 'הוספת אלמנט' },
-
-    {
-        type: 'control-row', label: 'בחר סוג אלמנט', inputType: 'select', id: 'elementTypeSelect',
-        options: Object.keys(elementDefinitions).map(k => ({ value: k, text: elementDefinitions[k].label })),
-        onChange: (v) => renderDynamicFields(v) // קריאה לפונקציה המקורית שבונה את השדות האמצעיים
-    },
-
-    // קונטיינר לשדות הדינמיים
-    {
-        id: 'dynamicFormFields',
-        style: 'margin: 15px 0; border-top: 1px solid #eee; padding-top: 15px;'
-    },
-
-    {
-        type: 'control-row', label: 'מזהה ייחודי (ID)', inputType: 'text', id: 'newElementId',
-        placeholder: 'אופציונלי...', style: 'direction:ltr;'
-    },
-
-    {
-        type: 'button', id: 'btnAdd', label: '+ הוסף למסמך', class: 'ui-btn-primary',
-        onClick: executeAdd // הפונקציה המקורית
-    }
-];
-
-function loadAddElementPanel() {
-    buildUiPanel(document.getElementById('panel-add-element'), addElementSchema, {});
-    // אתחול ראשוני של השדות הדינמיים
-    const select = document.getElementById('elementTypeSelect');
-    if (select) renderDynamicFields(select.value);
-}
-loadAddElementPanel();

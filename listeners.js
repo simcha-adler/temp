@@ -26,9 +26,7 @@ function loadDocumentListeners() {
         let value = input.value;
 
         if (input.type === 'checkbox') {
-            if (data.v)
-                value = input.checked ? data.v : data.x;
-            else value = input.checked;
+            value = input.checked ? data.v : data.x;
         }
 
         if (prop === 'gradient') {

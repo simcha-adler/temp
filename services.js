@@ -56,7 +56,7 @@ function getStyle(selector, prop) {
     if (!styleState[selector] || !styleState[selector].rule) {
         return '';
     }
-    // קריאה ישירה מהחוק החי
+
     return styleState[selector].rule.style[prop];
 }
 
@@ -321,4 +321,18 @@ function populatePanelValues(panel) {
             input.value = value ? value.replace(/"/g, '').trim() : '';
         }
     });
+}
+
+
+function parseUnit(value) {
+    if (!value) return { value: '', unit: 'px' };
+    const match = value.match(/^([\d\.\-]+)([a-z%]*)$/);
+    if (match) return { value: match[1], unit: match[2] || 'px' };
+    return { value: value, unit: 'px' };
+}
+
+function getActiveSelectorKey() {
+    if (!theElement) return '';
+    const state = $('dropdown-states').value || '';
+    return '#' + theElement.id + state;
 }

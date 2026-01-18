@@ -31,13 +31,13 @@ function updateSelectedElement(newElement = null) {
 function updatePanel(panel) {
     if (thePanel === panel) return;
 
-    if (thePanel) setTimeout(thePanel.style.display = 'none', 3000);
+    if (thePanel) thePanel.style.display = 'none';
     thePanel = panel;
     if (panel) {
         panel.style.display = 'block';
         // לבטל כשאסיר את טולבאר
-        if (panel === panelTree)
-            renderTree();
+        if (panel.id === 'panel-settings')
+            settings.fillPanel();
         else
             populatePanelValues(thePanel);
     }

@@ -2,226 +2,122 @@
 //   הגדרות הרכיבים (Metadata)
 // ==========================================
 // (נשאר זהה לקוד המקורי שלך - לא שיניתי את ההגדרות)
-const elementDefinitions = {
+const elementsList = {
     'h1': {
         label: '🇹 כותרת ראשית (H1)',
         fields: [
-            { key: 'text', label: 'תוכן', type: 'text', default: 'כותרת ראשית' },
-            { key: 'color', label: 'צבע', type: 'color', default: '#333333' }
+            { type: 'control-row', key: 'text', label: 'תוכן', inputType: 'text', value: 'כותרת ראשית' },
+            { type: 'control-row', key: 'color', label: 'צבע', inputType: 'color', value: '#333333' }
         ]
     },
     'h2': {
         label: '🇹 כותרת משנית (H2)',
         fields: [
-            { key: 'text', label: 'תוכן', type: 'text', default: 'כותרת משנה' },
-            { key: 'color', label: 'צבע', type: 'color', default: '#555555' }
+            { type: 'control-row', key: 'text', label: 'תוכן', inputType: 'text', value: 'כותרת משנה' },
+            { type: 'control-row', key: 'color', label: 'צבע', inputType: 'color', value: '#555555' }
         ]
     },
     'p': {
         label: '📝 פסקה (Paragraph)',
         fields: [
-            { key: 'text', label: 'תוכן', type: 'textarea', default: 'טקסט לדוגמה...' },
-            { key: 'fontSize', label: 'גודל (px)', type: 'number', default: '16' },
-            { key: 'lineHeight', label: 'גובה שורה', type: 'number', default: '1.5' }
+            { type: 'control-row', key: 'text', label: 'תוכן', inputType: 'textarea', value: 'טקסט לדוגמה...' },
+            { type: 'control-row', key: 'fontSize', label: 'גודל (px)', inputType: 'number', value: '16' },
+            { type: 'control-row', key: 'lineHeight', label: 'גובה שורה', inputType: 'number', value: '1.5' }
         ]
     },
     'img': {
         label: '🖼️ תמונה (Image)',
         fields: [
-            { key: 'src', label: 'URL', type: 'text', default: 'https://via.placeholder.com/400x300' },
-            { key: 'alt', label: 'תיאור', type: 'text', default: 'תמונה' },
-            { key: 'width', label: 'רוחב (%)', type: 'number', default: '100' },
-            { key: 'borderRadius', label: 'עיגול (px)', type: 'number', default: '8' }
+            { type: 'control-row', key: 'src', label: 'URL', inputType: 'text', value: 'https://via.placeholder.com/400x300' },
+            { type: 'control-row', key: 'alt', label: 'תיאור', inputType: 'text', value: 'תמונה' },
+            { type: 'control-row', key: 'width', label: 'רוחב (%)', inputType: 'number', value: '100' },
+            { type: 'control-row', key: 'borderRadius', label: 'עיגול (px)', inputType: 'number', value: '8' }
         ]
     },
     'video': {
         label: '🎬 וידאו (Video)',
         fields: [
-            { key: 'src', label: 'URL', type: 'text', default: 'https://www.w3schools.com/html/mov_bbb.mp4' },
-            { key: 'controls', label: 'פקדים', type: 'checkbox', default: true },
-            { key: 'autoplay', label: 'ניגון אוטומטי', type: 'checkbox', default: false }
+            { type: 'control-row', key: 'src', label: 'URL', inputType: 'text', value: 'https://www.w3schools.com/html/mov_bbb.mp4' },
+            { type: 'control-row', key: 'controls', label: 'פקדים', inputType: 'checkbox', value: true },
+            { type: 'control-row', key: 'autoplay', label: 'ניגון אוטומטי', inputType: 'checkbox', value: false }
         ]
     },
     'button': {
         label: '🔘 כפתור (Button)',
         fields: [
-            { key: 'text', label: 'טקסט', type: 'text', default: 'לחץ כאן' },
-            { key: 'backgroundColor', label: 'רקע', type: 'color', default: '#0078d4' },
-            { key: 'color', label: 'טקסט', type: 'color', default: '#ffffff' },
-            { key: 'borderRadius', label: 'עיגול (px)', type: 'number', default: '4' },
-            { key: 'padding', label: 'ריווח', type: 'text', default: '10px 20px' }
+            { type: 'control-row', key: 'text', label: 'טקסט', inputType: 'text', value: 'לחץ כאן' },
+            { type: 'control-row', key: 'backgroundColor', label: 'רקע', inputType: 'color', value: '#0078d4' },
+            { type: 'control-row', key: 'color', label: 'טקסט', inputType: 'color', value: '#ffffff' },
+            { type: 'control-row', key: 'borderRadius', label: 'עיגול (px)', inputType: 'number', value: '4' },
+            { type: 'control-row', key: 'padding', label: 'ריווח', inputType: 'text', value: '10px 20px' }
         ]
     },
     'a': {
         label: '🔗 קישור (Link)',
         fields: [
-            { key: 'text', label: 'טקסט', type: 'text', default: 'עבור לאתר' },
-            { key: 'href', label: 'URL', type: 'text', default: 'https://google.com' },
-            { key: 'target', label: 'חלון חדש', type: 'checkbox', default: true },
-            { key: 'color', label: 'צבע', type: 'color', default: '#0078d4' }]
+            { type: 'control-row', key: 'text', label: 'טקסט', inputType: 'text', value: 'עבור לאתר' },
+            { type: 'control-row', key: 'href', label: 'URL', inputType: 'text', value: 'https://google.com' },
+            { type: 'control-row', key: 'target', label: 'חלון חדש', inputType: 'checkbox', value: true },
+            { type: 'control-row', key: 'color', label: 'צבע', inputType: 'color', value: '#0078d4' }]
     },
     'div': {
         label: '🔲 קופסה (Container)',
         fields: [
-            { key: 'minHeight', label: 'גובה מינ\' (px)', type: 'number', default: '100' },
-            { key: 'backgroundColor', label: 'רקע', type: 'color', default: '#f9f9f9' },
-            { key: 'padding', label: 'ריווח', type: 'text', default: '20px' },
-            { key: 'border', label: 'מסגרת', type: 'checkbox', default: true }
+            { type: 'control-row', key: 'minHeight', label: 'גובה מינ\' (px)', inputType: 'number', value: '100' },
+            { type: 'control-row', key: 'backgroundColor', label: 'רקע', inputType: 'color', value: '#f9f9f9' },
+            { type: 'control-row', key: 'padding', label: 'ריווח', inputType: 'text', value: '20px' },
+            { type: 'control-row', key: 'border', label: 'מסגרת', inputType: 'checkbox', value: true }
         ]
     },
     'details': {
         label: '🔻 אקורדיון (Details)',
         fields: [
-            { key: 'summary', label: 'כותרת', type: 'text', default: 'לחץ לפתיחה' },
-            { key: 'content', label: 'תוכן', type: 'textarea', default: 'תוכן מוסתר...' }
+            { type: 'control-row', key: 'summary', label: 'כותרת', inputType: 'text', value: 'לחץ לפתיחה' },
+            { type: 'control-row', key: 'content', label: 'תוכן', inputType: 'textarea', value: 'תוכן מוסתר...' }
         ]
     },
     'card': {
         label: '🃏 כרטיס (Card)',
         fields: [
-            { key: 'imgSrc', label: 'תמונה', type: 'text', default: 'https://via.placeholder.com/300x200' },
-            { key: 'title', label: 'כותרת', type: 'text', default: 'כותרת' },
-            { key: 'desc', label: 'תיאור', type: 'textarea', default: 'תיאור קצר.' },
-            { key: 'btnText', label: 'כפתור', type: 'text', default: 'קרא עוד' }
+            { type: 'control-row', key: 'imgSrc', label: 'תמונה', inputType: 'text', value: 'https://via.placeholder.com/300x200' },
+            { type: 'control-row', key: 'title', label: 'כותרת', inputType: 'text', value: 'כותרת' },
+            { type: 'control-row', key: 'desc', label: 'תיאור', inputType: 'textarea', value: 'תיאור קצר.' },
+            { type: 'control-row', key: 'btnText', label: 'כפתור', inputType: 'text', value: 'קרא עוד' }
         ]
     }
 };
 
-// ==========================================
-//   בניית הממשק (HTML & Setup)
-// ==========================================
+const addElementSchema = [
+    { type: 'title', label: 'הוספת אלמנט' },
 
-/*const htmlAddElement = /* html *//* `
-    <style>
-        .add-element-header { margin-bottom: 15px; }
-        .form-group { margin-bottom: 12px; }
-        .form-label { display: block; font-size: 12px; font-weight: 500; color: #444; margin-bottom: 5px; }
-        
-        .styled-select, .styled-input, .styled-textarea {
-            width: 100%;
-            padding: 8px 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 13px;
-            background: var(--ui-base);
-            box-sizing: border-box;
-            transition: border-color 0.2s;
-        }
-        .styled-select:focus, .styled-input:focus, .styled-textarea:focus {
-            border-color: #0078d4;
-            outline: none;
-        }
+    {
+        type: 'control-row', label: 'בחר סוג אלמנט', inputType: 'select', id: 'elementTypeSelect',
+        options: Object.keys(elementsList).map(k => ({ value: k, text: elementsList[k].label })),
+    },
 
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #f9f9f9;
-            padding: 8px;
-            border-radius: 6px;
-            border: 1px solid #eee;
-        }
-        .checkbox-group input { margin: 0; }
-        .checkbox-group label { margin: 0; cursor: pointer; flex: 1;}
+    // קונטיינר לשדות הדינמיים
+    {
+        type: 'div', id: 'dynamicFormFields',
+        style: 'margin: 15px 0; border-top: 1px solid #eee; padding-top: 15px;'
+    },
 
-        .btn-primary {
-            background-color: #0078d4;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            width: 100%;
-            font-weight: 600;
-            font-size: 14px;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            transition: background 0.2s;
-            margin-top: 20px;
-        }
-        .btn-primary:hover { background-color: #0063b1; }
-        
-        .separator { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
-        .element-id-hint { font-size: 11px; color: #888; margin-top: 4px; display: block; }
-    </style>
+    {
+        type: 'control-row', label: 'מזהה ייחודי (ID)', inputType: 'text', id: 'newElementId',
+        placeholder: 'אופציונלי...', style: 'direction:ltr;'
+    },
 
-    <h4>הוספת אלמנט</h4>
-    
-    <div class="form-group">
-        <label class="form-label">בחר סוג אלמנט:</label>
-        <div style="position:relative;">
-            <select id="elementTypeSelect" class="styled-select" style="appearance: none; font-weight:bold;">
-            </select>
-            <div style="position:absolute; left:10px; top:50%; transform:translateY(-50%); pointer-events:none; color:#666;">▼</div>
-        </div>
-    </div>
-
-    <div class="separator"></div>
-
-    <div id="dynamicFormFields"></div>
-
-    <div class="separator"></div>
-
-    <div class="form-group">
-        <label class="form-label">מזהה ייחודי - מומלץ</label>
-        <input type="text" id="newElementId" class="styled-input" placeholder="למשל: hero_section" style="direction:ltr;">
-        <span class="element-id-hint">השאר ריק ליצירה אוטומטית</span>
-    </div>
-
-    <button id="btnAdd" class="btn-primary">
-         <span>+</span> הוסף למסמך
-    </button>
-`;*/
-
-const htmlAddElement = /* html */ `
-<div class="ui-panel">
-    <div class="ui-title">הוספת אלמנט</div>
-    
-    <div class="ui-control">
-        <label class="ui-label">בחר סוג:</label>
-        <div class="ui-input-group">
-             <select id="elementTypeSelect" class="ui-select" style="font-weight:bold;"></select>
-             <span class="ui-addon">▼</span>
-        </div>
-    </div>
-
-    <div id="dynamicFormFields" style="margin: 15px 0; border-top:1px solid var(--ui-10); padding-top:15px;">
-        </div>
-
-    <div class="ui-control">
-        <label class="ui-label">מזהה (ID) - אופציונלי</label>
-        <input type="text" id="newElementId" class="ui-input" placeholder="למשל: hero_section" style="direction:ltr;">
-    </div>
-
-    <button id="btnAdd" class="ui-btn ui-btn-primary ui-btn-full">
-         + הוסף למסמך
-    </button>
-</div>
-`;
-
-
-
-htmlAddElement.into('#panel-add-element');
+    {
+        type: 'button', id: 'btnAdd', label: '+ הוסף למסמך', class: 'ui-btn-primary',
+        onClick: executeAdd // הפונקציה המקורית
+    }
+];
 
 function loadAddElementPanel() {
+    buildUiPanel($('panel-add-element'), addElementSchema);
+    // אתחול ראשוני של השדות הדינמיים
     const select = $('elementTypeSelect');
-    select.innerHTML = ''; // איפוס
-
-    // מילוי ה-Select
-    Object.keys(elementDefinitions).forEach(type => {
-        const option = document.createElement('option');
-        option.value = type;
-        option.textContent = elementDefinitions[type].label;
-        select.appendChild(option);
-    });
-
-    // האזנה לשינוי סוג האלמנט -> בניית הטופס מחדש
-    select.when('change', () => {
-        renderDynamicFields(select.value);
-    });
-
-    // אתחול ראשוני (הצג שדות של הסוג הראשון)
     renderDynamicFields(select.value);
-    $('btnAdd').whenClick(executeAdd);
+    select.when('change', (v) => renderDynamicFields(v.target.value));
 }
 
 /**
@@ -230,9 +126,11 @@ function loadAddElementPanel() {
 function renderDynamicFields(type) {
     const container = $('dynamicFormFields');
     container.innerHTML = '';
-    const config = elementDefinitions[type];
+    const config = elementsList[type];
     if (!config || !config.fields) return;
 
+    config.fields.forEach(field => container.append(renderComponent(field)));
+    /*
     config.fields.forEach(field => {
         const wrapper = document.createElement('div');
         wrapper.className = 'form-group';
@@ -276,7 +174,7 @@ function renderDynamicFields(type) {
             wrapper.appendChild(input);
         }
         container.appendChild(wrapper);
-    });
+    });*/
 }
 
 
@@ -289,7 +187,7 @@ function renderDynamicFields(type) {
  */
 function executeAdd() {
     const type = $('elementTypeSelect').value;
-    const config = elementDefinitions[type];
+    const config = elementsList[type];
 
     let baseId = $('newElementId').value;
     baseId = createSafeId(baseId, type);
@@ -297,7 +195,7 @@ function executeAdd() {
 
     const data = {};
     config.fields.forEach(field => {
-        const input = $('field_' + field.key);
+        const input = $(field.key);
         data[field.key] = field.type === 'checkbox' ? input.checked : input.value;
     });
 
@@ -347,9 +245,7 @@ function buildElementStructure(type, data, baseId) {
         };
 
         // 2. תמונה
-        const img = document.createElement('img');
-        img.id = baseId + '_img';
-        img.src = data.imgSrc;
+        const img = createElement('img', { id: baseId + '_img', src: data.imgSrc });
         el.appendChild(img);
         rules['#' + baseId + '_img'] = {
             width: '100%',
@@ -359,28 +255,19 @@ function buildElementStructure(type, data, baseId) {
         };
 
         // 3. תוכן הכרטיס (עוטף)
-        const content = document.createElement('div');
-        content.id = baseId + '_content';
+        const content = createElement('div', { id: baseId + '_content' });
         el.appendChild(content);
         rules['#' + baseId + '_content'] = { padding: '15px' };
 
         // 4. כותרת
-        const h3 = document.createElement('h3');
-        h3.id = baseId + '_title';
-        h3.innerText = data.title;
+        const h3 = createElement('h3', { id: baseId + '_title', text: data.title });
         content.appendChild(h3);
         rules['#' + baseId + '_title'] = { margin: '0 0 10px 0', fontSize: '18px' };
 
         // 5. תיאור
-        const p = document.createElement('p');
-        p.innerText = data.desc;
-        p.id = baseId + '_desc';
+        const p = createElement('p', { text: data.desc, id: baseId + '_desc' });
         content.appendChild(p);
-        rules['#' + baseId + '_desc'] = {
-            fontSize: '14px',
-            color: '#666',
-            margin: '0 0 15px 0'
-        };
+        rules['#' + baseId + '_desc'] = { fontSize: '14px', color: '#666', margin: '0 0 15px 0' };
         // 6. כפתור
         const b = document.createElement('button');
         b.innerText = data.btnText;
@@ -418,12 +305,8 @@ function buildElementStructure(type, data, baseId) {
         myStyle.maxWidth = '100%';
     }
     if (type === 'details') {
-        const s = document.createElement('summary');
-        s.id = baseId + '_summary'
-        s.innerText = data.summary;
-        const p = document.createElement('p');
-        p.id = baseId + '_p'
-        p.innerText = data.content;
+        const s = createElement('summary', { id: baseId + '_summary', text: data.summary });
+        const p = createElement('p', { id: baseId + '_p', text: data.content });
         el.append(s, p);
         myStyle.border = '1px solid #ccc';
         myStyle.padding = '10px';

@@ -46,4 +46,6 @@ const viewSchema = [
 
 buildUiPanel($('panel-display'), viewSchema);
 populatePanelValues($('panel-display'), theStyles);
+// יצירת מצביע תואם לכל אפשרות בתפריט "מצביע".
+Array.from($([data - property] = 'cursor').children).forEach(opt => opt.style.cursor = opt.value);
 

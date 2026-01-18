@@ -1,47 +1,3 @@
-/*const htmlDesign = /* html */ /*`
-
-<h4>צבע וטיפוגרפיה</h4>
-
-<label for="fontFamilyInput" class="design-control">
-    <span>גופן</span>
-    <select id="fontFamilyInput" data-property="fontFamily" style="width: 120px;">
-        <option value="Arial, sans-serif">Arial</option>
-        <option value="'Times New Roman', serif">Times New Roman</option>
-        <option value="'Courier New', monospace">Courier New</option>
-        <option value="Georgia, serif">Georgia</option>
-        <option value="Verdana, sans-serif">Verdana</option>
-    </select>
-</label>
-
-<label for="fontSizeInput" class="design-control">
-    <span>גודל גופן (px)</span>
-    <input type="number" id="fontSizeInput" data-property="fontSize" data-unit="px" min="8" max="120" value="16"
-        style="width: 50px; text-align: left;">
-</label>
-
-<label for="colorInput" class="design-control input-color">
-    <!--span>צבע טקסט</span>
-    <input type="color" id="colorInput" data-property="color" value="#000000"-->
-</label>
-
-<label for="bgColorInput" class="design-control">
-    <span>צבע רקע (סימון)</span>
-    <input type="color" id="bgColorInput" data-property="backgroundColor" value="#ffff00">
-</label>
-
-<button id="gradientBtn">גרדיאנט</button>
-<div id="gradientDiv" style="display: none;">
-    <label for="bgColorInput" class="design-control">            
-        <span>זווית</span>
-        <input type="number" id="deg" data-property="gradient" value="0"  style="width: 50px; text-align: center;">
-        <span>צבע 1</span>
-        <input type="color" id="gradient1" data-property="gradient" value="#ffffff">
-        <span>צבע 2</span>
-        <input type="color" id="gradient2" data-property="gradient" value="#ffffff">
-    </label>
-</div>
-`;*/
-
 
 const htmlDesign = /* html */ `
 <div class="ui-panel">
@@ -140,3 +96,51 @@ function buildDesignPanel() {
 
 loadDesignListeners();
 buildDesignPanel();
+
+
+const designSchema = [
+    { type: 'title', label: 'עיצוב טקסט וצבע' },
+
+    {
+        type: 'section', label: 'טיפוגרפיה', collapsed: false,
+        children: [
+            {
+                type: 'control-row', label: 'גופן', inputType: 'select', prop: 'fontFamily',
+                options: [
+                    { value: 'Arial', text: 'Arial' },
+                    { value: 'Verdana', text: 'Verdana' },
+                    { value: 'Times New Roman', text: 'Times New Roman' },
+                    { value: 'Courier New', text: 'Courier New' },
+                    { value: 'System-ui', text: 'System-ui' }
+                ],
+                onChange: (v) => updateStyle(getActiveSelectorKey(), 'fontFamily', v)
+            },
+            {
+                type: 'control-row', label: 'גודל', inputType: 'number', prop: 'fontSize', unit: 'px',
+                onChange: (v) => updateStyle(getActiveSelectorKey(), 'fontSize', v)
+            },
+            {
+                type: 'control-row', label: 'משקל', inputType: 'select', prop: 'fontWeight',
+                options: [{ value: '400', text: 'רגיל' }, { value: '700', text: 'מודגש' }],
+                onChange: (v) => updateStyle(getActiveSelectorKey(), 'fontWeight', v)
+            }
+        ]
+    },
+
+    {
+        type: 'section', label: 'צבעים', collapsed: false,
+        children: [
+            {
+                type: 'control-row', label: 'צבע טקסט', inputType: 'color', prop: 'color',
+                onChange: (v) => updateStyle(getActiveSelectorKey(), 'color', v)
+            },
+            {
+                type: 'control-row', label: 'צבע רקע', inputType: 'color', prop: 'backgroundColor',
+                onChange: (v) => updateStyle(getActiveSelectorKey(), 'backgroundColor', v)
+            }
+        ]
+    }
+];
+
+buildUiPanel($('panel-design'), designSchema);
+
